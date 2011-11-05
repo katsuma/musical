@@ -1,16 +1,16 @@
 = musical
 
-Musical is a simple rip and convert tool for your DVD.
+Musical is a simple tool for your DVD.
 It enables you to rip and convert it to wav data by chapter.
 
 
 == Install
 
-1. Install dvdbackup and ffmpeg. For example,
+1 Install dvdbackup and ffmpeg. For example,
   brew install dvdbackup
   brew install ffmpeg
 
-1. Install gem
+2 Install gem
   gem install musical
 
 
@@ -31,8 +31,7 @@ Options:
 
 === On Mac OS X 10.7.x, I cannot install ffmpeg.
 
-The latest Xcode doesn't include gcc. Install gcc-4.2
-https://github.com/kennethreitz/osx-gcc-installer
+The latest Xcode doesn't include gcc. Install gcc-4.2[https://github.com/kennethreitz/osx-gcc-installer].
 
 And try this.
   brew install --use-clang --HEAD --use-gcc ffmpeg
