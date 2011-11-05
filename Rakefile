@@ -17,8 +17,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "musical"
   gem.homepage = "http://github.com/katsuma/musical"
   gem.license = "MIT"
-  gem.summary = %Q{A simple tool for your DVD}
-  gem.description = %Q{Musical is a simple tool for your DVD. It enables you to rip and convert it to wav data by chapter.}
+  gem.summary = %Q{A simple rip and convert tool for your DVD}
+  gem.description = %Q{Musical is a simple rip and convert tool for your DVD. It enables you to rip and convert it to wav data by chapter.}
   gem.email = "katsuma@gmail.com"
   gem.authors = ["ryo katsuma"]
   # dependencies defined in Gemfile
