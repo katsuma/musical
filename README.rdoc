@@ -10,7 +10,7 @@ It enables you to rip and convert it to wav data by chapter.
   brew install dvdbackup
   brew install ffmpeg
 
-2. Install gem
+1. Install gem
   gem install musical
 
 
