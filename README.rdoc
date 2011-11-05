@@ -3,6 +3,17 @@
 Musical is a simple rip and convert tool for your DVD.
 It enables you to rip and convert it to wav data by chapter.
 
+
+== Install
+
+1. Install dvdbackup and ffmpeg. For example,
+  brew install dvdbackup
+  brew install ffmpeg
+
+2. Install gem
+  gem install musical
+
+
 == Usage
 musical <options>
 
@@ -16,15 +27,24 @@ Options:
                   --help, -h:   Show this message
 
 
-== Contributing to musical
- 
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
-* Fork the project
-* Start a feature/bugfix branch
-* Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+== FAQ
+
+=== On Mac OS X 10.7.x, I cannot install ffmpeg.
+
+The latest Xcode doesn't include gcc. Install gcc-4.2
+https://github.com/kennethreitz/osx-gcc-installer
+
+And try this.
+  brew install --use-clang --HEAD --use-gcc ffmpeg
+
+
+=== I got an error, /bin/sh: /usr/bin/pod2man: Permission denied
+
+/usr/bin/pod2man may not have execute permission.
+
+Try this.
+  sudo chmod +x /usr/bin/pod2man
+
 
 == Copyright
 

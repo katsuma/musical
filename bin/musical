@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require 'bundler/setup'
-require 'Musical'
+require 'musical'
+
+include Musical
 
 DVD.new
