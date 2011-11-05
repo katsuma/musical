@@ -1,6 +1,20 @@
 = musical
 
-Description goes here.
+Musical is a simple tool for your DVD.
+It enables you to rip and convert it to wav data by chapter.
+
+== Usage
+musical <options>
+
+Options:
+                  --info, -i:   Show your DVD data
+  --ignore-convert-sound, -g:   Rip data only, NOT convert them to wav file
+               --dev, -d <s>:   Set location of DVD device
+             --title, -t <s>:   Set DVD title (default: LIVE)
+            --output, -o <s>:   Set location of ripped data (default: ripped)
+               --version, -v:   Print version and exit
+                  --help, -h:   Show this message
+
 
 == Contributing to musical
  
