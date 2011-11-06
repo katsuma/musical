@@ -10,8 +10,10 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ryo katsuma"]
   s.date = %q{2011-11-06}
-  s.description = %q{Musical is a simple tool for your DVD. It enables you to rip and convert it to wav data by chapter.}
+  s.default_executable = %q{musical}
+  s.description = %q{Musical is a simple rip and convert tool for your DVD. It enables you to rip and convert it to wav data by chapter.}
   s.email = %q{katsuma@gmail.com}
+  s.executables = ["musical"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -24,16 +26,17 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "bin/musical",
     "lib/musical.rb",
+    "musical.gemspec",
     "spec/musical_spec.rb",
     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/katsuma/musical}
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.executables = ["bin/musical"]
   s.rubygems_version = %q{1.6.2}
-  s.summary = %q{A simple tool for your DVD}
+  s.summary = %q{A simple rip and convert tool for your DVD}
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
