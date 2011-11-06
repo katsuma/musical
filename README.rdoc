@@ -35,7 +35,7 @@ Options:
 The latest Xcode doesn't include gcc. Install gcc-4.2[https://github.com/kennethreitz/osx-gcc-installer].
 
 And try this.
-  brew install --use-clang --HEAD --use-gcc ffmpeg
+  brew install --use-gcc ffmpeg
 
 
 === I got an error, /bin/sh: /usr/bin/pod2man: Permission denied
