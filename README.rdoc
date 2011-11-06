@@ -15,7 +15,8 @@ It enables you to rip and convert it to wav data by chapter.
 
 
 == Usage
-musical <options>
+Set you DVD and type
+  musical <options>
 
 Options:
                   --info, -i:   Show your DVD data
@@ -43,6 +44,11 @@ And try this.
 
 Try this.
   sudo chmod +x /usr/bin/pod2man
+
+
+=== I got nothing 'musical --info'
+
+Your DVD may be copy-protected. Try fairmount[http://www.metakine.com/products/fairmount/].
 
 
 == Copyright

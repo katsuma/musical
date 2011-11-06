@@ -29,7 +29,7 @@ module Musical
         version 'Musical 0.0.1'
         opt :info, "Show your DVD data", :type => :boolean
         opt :ignore_convert_sound, "Rip data only, NOT convert them to wav file", :type => :boolean
-        opt :dev, "Set location of DVD device", :default => DVD.detect.first
+        opt :dev, "Set location of DVD device"
         opt :title, "Set DVD title", :default => 'LIVE'
         opt :output, "Set location of ripped data", :default => 'ripped'
       end
@@ -37,13 +37,19 @@ module Musical
     end
 
     def run
+      check_env
       return puts info if @opts[:info]
       rip_by_chapter
       convert_sound unless @opts[:ignore_convert_sound]
     end
 
+    def dev
+      @_dev ||= DVD.detect.first
+    end
+
     def info
-      @_info ||= `dvdbackup --input=#{@opts[:dev]} --info 2>/dev/null`
+      raise "Not detect DVD device" if dev.empty?
+      @_info ||= `dvdbackup --input=#{dev} --info 2>/dev/null`
     end
 
     def title_with_chapters
@@ -68,7 +74,8 @@ module Musical
     end
 
     def rip_by_chapter
-      puts "Ripping #{title_with_chapters.size} titles, #{chapter_size} chapters to #{@opts[:output]} directory"
+      task_message "Ripping"
+
       pbar = ProgressBar.new "Ripping", chapter_size
       title_with_chapters.each_with_index do |title_chapter, title_index|
         ripped_dir_base = "#{@opts[:output]}"
@@ -76,7 +83,7 @@ module Musical
         FileUtils.mkdir_p "#{saved_dir}"
 
         1.upto title_chapter[:chapter] do |chapter|
-          `dvdbackup --name=#{@opts[:title]} --input=#{@opts[:dev]} --title=#{title_index+1} --start=#{chapter} --end=#{chapter} --output=#{ripped_dir_base}_#{title_index}_#{chapter} 2>/dev/null`
+          `dvdbackup --name=#{@opts[:title]} --input=#{dev} --title=#{title_index+1} --start=#{chapter} --end=#{chapter} --output=#{ripped_dir_base}_#{title_index}_#{chapter} 2>/dev/null`
           pbar.inc
 
           # moved file
@@ -89,7 +96,8 @@ module Musical
     end
 
     def convert_sound
-      puts "Converting #{title_with_chapters.size} titles, #{chapter_size} chapters to #{@opts[:output]} directory"
+      task_message "Converting"
+
       pbar = ProgressBar.new "Converting", chapter_size
       title_with_chapters.each_with_index do |title_chapter, title_index|
         ripped_dir_base = "#{@opts[:output]}"
@@ -104,10 +112,25 @@ module Musical
       pbar.finish
     end
 
+    def task_message(task)
+      raise "Not found any titles and chapters" if title_with_chapters.size == 0 && chapter_size == 0
+      puts "#{task} #{title_with_chapters.size} titles, #{chapter_size} chapters to #{@opts[:output]} directory"
+    end
+    private :task_message
+
     def chapter_size
       @_chapter_size ||= title_with_chapters.inject(0){ |count, t| count + t[:chapter]}
     end
     private :chapter_size
+
+    def check_env
+      ['dvdbackup', 'ffmpeg'].each do |app|
+        if `which #{app}`.empty?
+          raise RuntimeError, "\n\n'#{app}' is not installed.\n\ntry:\n  brew install #{app}\n\n"
+        end
+      end
+    end
+    private :check_env
 
   end
 end
