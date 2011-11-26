@@ -2,6 +2,7 @@ source "http://rubygems.org"
 
 gem "trollop", ">=1.16.2"
 gem "progressbar", ">=0.9.1"
+gem "rb-appscript", ">=0.6.1"
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{musical}
-  s.version = "0.0.1"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ryo katsuma"]
-  s.date = %q{2011-11-06}
+  s.date = %q{2011-11-26}
   s.default_executable = %q{musical}
   s.description = %q{Musical is a simple rip and convert tool for your DVD. It enables you to rip and convert it to wav data by chapter.}
   s.email = %q{katsuma@gmail.com}
@@ -28,6 +28,8 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/musical",
     "lib/musical.rb",
+    "lib/musical/dvd.rb",
+    "lib/musical/itunes.rb",
     "musical.gemspec",
     "spec/musical_spec.rb",
     "spec/spec_helper.rb"
@@ -44,6 +46,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<trollop>, [">= 1.16.2"])
       s.add_runtime_dependency(%q<progressbar>, [">= 0.9.1"])
+      s.add_runtime_dependency(%q<rb-appscript>, [">= 0.6.1"])
       s.add_development_dependency(%q<rspec>, ["~> 2.3.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
@@ -51,6 +54,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<trollop>, [">= 1.16.2"])
       s.add_dependency(%q<progressbar>, [">= 0.9.1"])
+      s.add_dependency(%q<rb-appscript>, [">= 0.6.1"])
       s.add_dependency(%q<rspec>, ["~> 2.3.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
@@ -59,6 +63,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<trollop>, [">= 1.16.2"])
     s.add_dependency(%q<progressbar>, [">= 0.9.1"])
+    s.add_dependency(%q<rb-appscript>, [">= 0.6.1"])
     s.add_dependency(%q<rspec>, ["~> 2.3.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.6.4"])

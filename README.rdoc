@@ -1,12 +1,12 @@
 = musical
 
 Musical is a simple tool for your DVD.
-It enables you to rip and convert it to wav data by chapter.
+It enables you to rip data by chapter, encode it with your iTunes setting and add it to your iTunes library automatically.
 
 
 == Install
 
-1 Install dvdbackup and ffmpeg. For example,
+1 Musical depends on dvdbackup and ffmpeg. To install them try this for example,
   brew install dvdbackup
   brew install ffmpeg
 
@@ -21,11 +21,16 @@ Set you DVD and type
 Options:
                   --info, -i:   Show your DVD data
   --ignore-convert-sound, -g:   Rip data only, NOT convert them to wav file
+     --ignore-use-itunes, -n:   NOT add ripped files to iTunes and encode the
                --dev, -d <s>:   Set location of DVD device
              --title, -t <s>:   Set DVD title (default: LIVE)
+            --artist, -a <s>:   Set DVD artist (default: Artist)
             --output, -o <s>:   Set location of ripped data (default: ripped)
                --version, -v:   Print version and exit
                   --help, -h:   Show this message
+
+
+When you use iTunes, you should use --title and --artist options. They will help you to manage your music library easily.
 
 
 == FAQ
