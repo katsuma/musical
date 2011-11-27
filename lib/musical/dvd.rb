@@ -24,8 +24,8 @@ module Musical
 
       return puts info if @opts[:info]
 
-      # rip_by_chapter
-      # convert_sound unless @opts[:ignore_convert_sound]
+      rip_by_chapter
+      convert_sound unless @opts[:ignore_convert_sound]
       to_itunes unless @opts[:ignore_use_itunes]
     end
 

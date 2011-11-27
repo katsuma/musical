@@ -23,7 +23,7 @@ module Musical
       version "Musical #{version}"
       opt :info, "Show your DVD data", :type => :boolean
       opt :ignore_convert_sound, "Rip data only, NOT convert them to wav file", :type => :boolean
-      opt :ignore_use_itunes, "NOT add ripped files to iTunes and encode them"
+      opt :ignore_use_itunes, "NOT add ripped files to iTunes and encode them", :type => :boolean
       opt :dev, "Set location of DVD device"
       opt :title, "Set DVD title", :default => 'LIVE'
       opt :artist, "Set DVD artist", :default => 'Artist'
