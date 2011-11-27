@@ -1,7 +1,7 @@
 = musical
 
-Musical is a simple tool for your DVD.
-It enables you to rip data by chapter, encode it with your iTunes setting and add it to your iTunes library automatically.
+Musical is a simple tool for your favorite music DVD.
+You can rip vob file by DVD chapter, convert it to wav file and add it to your iTunes library.
 
 
 == Install
@@ -15,7 +15,7 @@ It enables you to rip data by chapter, encode it with your iTunes setting and ad
 
 
 == Usage
-Set you DVD and type
+Set your DVD and type
   musical <options>
 
 Options:
