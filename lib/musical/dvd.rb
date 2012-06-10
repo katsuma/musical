@@ -10,7 +10,7 @@ module Musical
         file_system = info[0]
         capacity = info[1]
         mounted = info[2]
-        if capacity == "100%" && mounted.include?("/Volumes")
+        if capacity == "100%" && mounted.include?("/Volumes") && !(mounted.include?("MobileBackups"))
           candidates << mounted
         end
       end
