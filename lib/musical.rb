@@ -3,6 +3,7 @@ require 'trollop'
 require 'progressbar'
 require 'fileutils'
 require 'appscript'
+require 'rbconfig'
 
 require 'musical/dvd'
 require 'musical/itunes'
