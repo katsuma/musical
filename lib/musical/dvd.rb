@@ -2,14 +2,21 @@ module Musical
   class DVD
     attr_accessor :opts
 
+    MountainLionVersion = [10, 8]
+
     def self.detect
-      dev_infos = `df -h | awk {'print $1,$5,$6'}`.split("\n")
+      dev_infos = `df -h -l`.split("\n")
       candidates = []
       dev_infos.each do |dev_info|
-        info = dev_info.split(" ")
-        file_system = info[0]
-        capacity = info[1]
-        mounted = info[2]
+        if (`sw_vers -productVersion`.split(".").map(&:to_i) <=> MountainLionVersion) < 0
+          /([\w\/]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\d%]+)\s+(.*)$/ =~ dev_info
+          mounted = $6
+        else
+          /^([\w\/]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\d%]+)\s+(\d+)\s+(\d+)\s+([\d%]+)\s+(.*)$/ =~ dev_info
+          mounted = $9
+        end
+        file_system = $1
+        capacity = $5
         if capacity == "100%" && mounted.include?("/Volumes") && !(mounted.include?("MobileBackups"))
           candidates << mounted
         end
@@ -35,7 +42,7 @@ module Musical
 
     def info
       raise "Not detect DVD device" if dev.empty?
-      @_info ||= `dvdbackup --input=#{dev} --info 2>/dev/null`
+      @_info ||= `dvdbackup --input='#{dev}' --info 2>/dev/null`
     end
 
     def title_with_chapters
@@ -69,10 +76,10 @@ module Musical
         FileUtils.mkdir_p "#{saved_dir}"
 
         1.upto title_chapter[:chapter] do |chapter|
-          `dvdbackup --name=#{@opts[:trim_title]} --input=#{dev} --title=#{title_index+1} --start=#{chapter} --end=#{chapter} --output=#{ripped_dir_base}_#{title_index}_#{chapter} 2>/dev/null`
+          `dvdbackup --name=#{@opts[:trim_title]} --input='#{dev}' --title=#{title_index+1} --start=#{chapter} --end=#{chapter} --output='#{ripped_dir_base}_#{title_index}_#{chapter}' 2>/dev/null`
           pbar.inc
           # moved file
-          vob_path = `find #{ripped_dir_base}_#{title_index}_#{chapter} -name "*.VOB"`.chomp
+          vob_path = `find '#{ripped_dir_base}_#{title_index}_#{chapter}' -name "*.VOB"`.chomp
           FileUtils.mv vob_path, "#{saved_dir}/chapter_#{chapter}.VOB"
           FileUtils.rm_rf "#{ripped_dir_base}_#{title_index}_#{chapter}"
         end
