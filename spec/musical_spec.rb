@@ -1,7 +1,6 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+# coding: utf-8
+require 'spec_helper'
+require 'musical'
 
-describe "Musical" do
-  it "fails" do
-    fail "hey buddy, you should probably rename this file and start specing for real"
-  end
+describe Musical do
 end
