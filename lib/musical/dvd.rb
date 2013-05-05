@@ -1,29 +1,22 @@
+# coding: utf-8
 module Musical
   class DVD
     attr_accessor :opts
 
-    MountainLionVersion = [10, 8]
-
     def self.detect
-      dev_infos = `df -h -l`.split("\n")
-      candidates = []
-      dev_infos.each do |dev_info|
-        if (`sw_vers -productVersion`.split(".").map(&:to_i) <=> MountainLionVersion) < 0
-          /([\w\/]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\d%]+)\s+(.*)$/ =~ dev_info
-          mounted = $6
-        else
-          /^([\w\/]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\d%]+)\s+(\d+)\s+(\d+)\s+([\d%]+)\s+(.*)$/ =~ dev_info
-          mounted = $9
-        end
-        file_system = $1
-        capacity = $5
-        if capacity == "100%" && mounted.include?("/Volumes") && !(mounted.include?("MobileBackups"))
-          candidates << mounted
-        end
-      end
+      drutil_out, process_status = *Open3.capture2('drutil status')
 
-      raise "Not detect DVD device" if candidates.empty?
-      candidates
+      raise RuntimeError.new 'DVD drive is not found' unless drutil_out
+      raise RuntimeError.new 'DVD is not inserted'   unless drutil_out.include?('Name:')
+
+      file_system = drutil_out.split("\n").select do |line|
+        line.include?('Name:')
+      end.first.match(/Name: (.+)/)[1]
+
+      df_out, process_status = *Open3.capture2('df -H -a')
+      df_out.split("\n").select do |line|
+        line.include?(file_system)
+      end.first.gsub(/( ){2,}+/, "\t").split("\t").last
     end
 
     def initialize(options={})

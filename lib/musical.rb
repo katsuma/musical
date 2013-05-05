@@ -1,8 +1,10 @@
 require 'trollop'
 require 'progressbar'
 require 'fileutils'
+require 'open3'
 
 require 'musical/util'
+require 'musical/dvd'
 
 module Musical
   extend Musical::Util

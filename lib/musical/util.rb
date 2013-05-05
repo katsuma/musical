@@ -1,3 +1,4 @@
+# coding: utf-8
 module Musical
   module Util
     REQUIRED_APPS = %w(dvdbackup ffmpeg).freeze
