@@ -26,6 +26,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "guard-rspec", "~> 2.4.1"
   spec.add_development_dependency "growl", "~> 1.0.3"
   spec.add_development_dependency "fakefs", "~> 0.4.2"
+  spec.add_development_dependency "simplecov", "~> 0.7.1"
+  spec.add_development_dependency "coveralls", "~> 0.6.6"
   spec.add_runtime_dependency "progressbar", ">= 0.9.1"
   spec.add_runtime_dependency "trollop", ">= 2.0"
 end
