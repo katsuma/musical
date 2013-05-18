@@ -5,6 +5,7 @@ require 'open3'
 
 require 'musical/util'
 require 'musical/dvd'
+require 'musical/itunes'
 
 module Musical
   extend Musical::Util
