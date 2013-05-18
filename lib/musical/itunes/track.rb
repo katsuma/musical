@@ -16,8 +16,9 @@ module Musical
         Track.new(converted_persistent_id)
       end
 
-      def delete
+      def delete!
         execute_script('track/delete.scpt', @persistent_id)
+        @persistent_id = nil
       end
 
       def update_attribute!(attributes)

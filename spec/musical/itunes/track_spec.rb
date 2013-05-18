@@ -33,12 +33,15 @@ describe Musical::ITunes::Track do
     end
   end
 
-  describe '#delete' do
-    subject(:delete) { track.delete }
+  describe '#delete!' do
+    subject(:delete!) { track.delete! }
     let(:track) { described_class.new(persistent_id) }
-    it 'deletes a track' do
+    before do
       track.should_receive(:execute_script).with('track/delete.scpt', persistent_id)
-      delete
+    end
+    it 'deletes persistent_id' do
+      delete!
+      track.persistent_id.should be_nil
     end
   end
 end
