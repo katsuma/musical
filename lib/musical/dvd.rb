@@ -80,9 +80,9 @@ module Musical
           pbar.inc
           # moved file
           vob_path = `find '#{ripped_dir_base}_#{title_index}_#{chapter}' -name "*.VOB"`.chomp
-          vob_path.split.each{|vob|
+          vob_path.split.each do |vob|
             FileUtils.mv vob, "#{saved_dir}/chapter_#{chapter}.VOB"
-          }
+          end
           FileUtils.rm_rf "#{ripped_dir_base}_#{title_index}_#{chapter}"
         end
       end
