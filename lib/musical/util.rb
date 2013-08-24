@@ -19,16 +19,8 @@ module Musical
     end
 
     def installed?(app)
-      !!(system "which #{app}")
-    end
-
-    def execute_sctipt(script_path, args='')
-      execute_out, process_status = *Open3.capture2("osascript #{script_base_dir}/#{script_path} #{args}")
-      execute_out
-    end
-
-    def script_base_dir
-      File.expand_path("#{File.dirname(__FILE__)}/../../scripts")
+      execute_out, process_status = *Open3.capture2("which #{app}")
+      !execute_out.empty?
     end
   end
 end

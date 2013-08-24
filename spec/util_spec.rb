@@ -36,14 +36,14 @@ describe Musical::Util do
 
     context 'when app is not installed' do
       before do
-        klass.should_receive(:system).with("which #{app}").and_return(false)
+        Open3.should_receive(:capture2).with("which #{app}").and_return(['', 'process_status'])
       end
       it { should be_false }
     end
 
     context 'when spp is installed' do
       before do
-        klass.should_receive(:system).with("which #{app}").and_return(true)
+        Open3.should_receive(:capture2).with("which #{app}").and_return(['/path/to/app', 'process_status'])
       end
       it { should be_true }
     end
