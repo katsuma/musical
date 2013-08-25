@@ -19,8 +19,13 @@ module Musical
     end
 
     def installed?(app)
-      execute_out, process_status = *Open3.capture2("which #{app}")
-      !execute_out.empty?
+      !execute_command("which #{app}").empty?
+    end
+
+    def execute_command(cmd, silent = false)
+      cmd << ' 2>/dev/null' if silent
+      execute_out, _ = *Open3.capture2(cmd)
+      execute_out
     end
   end
 end
