@@ -2,19 +2,27 @@ require 'trollop'
 require 'progressbar'
 require 'fileutils'
 require 'open3'
+require 'ostruct'
 
+require 'musical/configuration'
 require 'musical/util'
+require 'musical/version'
 require 'musical/dvd'
-require 'musical/itunes'
+require 'musical/dvd/chapter'
 
 module Musical
   extend Musical::Util
+
+  def configuration
+    Configuration.config || Musical.setup
+  end
+  module_function :configuration
 
   def setup
     return unless check_env
 
     # parse options
-    Trollop::options do
+    options = Trollop::options do
       version "Musical #{Musical::VERSION}"
       opt :info, "Show your DVD data", type: :boolean
       opt :ignore_convert_sound, "Rip data only, NOT convert them to wav file", type: :boolean
@@ -24,6 +32,11 @@ module Musical
       opt :artist, "Set DVD artist", type: :string, default: 'Artist'
       opt :output, "Set location of ripped data", type: :string, default: 'ripped'
     end
+
+    configuration = Configuration.build(options)
+    yield(configuration) if block_given?
+
+    configuration
   end
   module_function :setup
 end
