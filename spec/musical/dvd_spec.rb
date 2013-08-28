@@ -2,16 +2,16 @@
 require 'spec_helper'
 require 'musical'
 
-describe Musical::DVD do
-  let(:dvd) { Musical::DVD }
+include Musical
 
+describe DVD do
   describe '.detect' do
-    subject(:detect) { dvd.detect }
+    subject(:detect) { DVD.detect }
     let(:drutil) { 'drutil status' }
 
     context 'when DVD drive is not found' do
       before do
-        Open3.should_receive(:capture2).with(drutil).and_return(['', 0])
+        DVD.should_receive(:execute_command).with(drutil).and_return('')
       end
 
       it 'raises a RuntimeError' do
@@ -28,7 +28,7 @@ MATSHITA DVD-R   UJ-85J    FM0S
 Type: No Media Inserted
 EOM
       end
-      before { Open3.should_receive(:capture2).with(drutil).and_return([drutil_out, 0]) }
+      before { DVD.should_receive(:execute_command).with(drutil).and_return(drutil_out) }
 
       it 'raises a RuntimeError' do
         expect { detect }.to raise_error(RuntimeError)
@@ -63,11 +63,77 @@ map auto_home      0B     0B     0B   100%          0         0  100%   /home
 EOM
       end
       before do
-        Open3.should_receive(:capture2).with(drutil).and_return([drutil_out, 0])
-        Open3.should_receive(:capture2).with(df).and_return([df_out, 0])
+        DVD.should_receive(:execute_command).with(drutil).and_return(drutil_out)
+        DVD.should_receive(:execute_command).with(df).and_return(df_out)
       end
 
       it { should == '/Volumes/DVD_VIDEO'}
     end
   end
+
+  describe '.dev' do
+    subject { DVD.dev }
+    context 'dev class property is not set' do
+      it 'returns nil' do
+        expect(subject).to eq(nil)
+      end
+    end
+
+    context 'dev class property is set' do
+      before{ DVD.dev = '/dev/path' }
+      it 'returns property value' do
+        expect(subject).to eq('/dev/path')
+      end
+    end
+  end
+
+  describe '.load' do
+    before { DVD.dev = nil }
+
+    context 'when options are not given' do
+      subject { DVD.load }
+
+      context 'and if dev path is set' do
+        before { DVD.dev = '/dev/some/path' }
+
+        it 'does not call DVD.detect' do
+          DVD.should_not_receive(:detect)
+          subject
+        end
+      end
+
+      context 'and if dev path is not set' do
+        it 'sets dev path by DVD.detect' do
+          DVD.should_receive(:detect).and_return('/dev/some/path')
+          subject
+          expect(DVD.dev).to eq('/dev/some/path')
+        end
+      end
+    end
+
+    context 'when options are given' do
+      subject { DVD.load(options) }
+      let(:options) { { dev: '/dev/path', title: 'some title' } }
+
+      it 'sets dev path by given option' do
+        subject
+        expect(DVD.dev).to eq('/dev/path')
+      end
+
+      it 'sets title by given option' do
+        subject
+        expect(DVD.instance.title).to eq('some title')
+      end
+    end
+
+    context 'when block is given' do
+      subject { DVD.load { |dvd| dvd.artist = 'some artist' }  }
+      before { DVD.should_receive(:detect).and_return('/dev/some/path') }
+      it 'calls proc object' do
+        subject
+        expect(DVD.instance.artist).to eq('some artist')
+      end
+    end
+  end
+
 end
