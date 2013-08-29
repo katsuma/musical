@@ -54,6 +54,19 @@ module Musical
       @info ||= execute_command("dvdbackup --input='#{@@dev}'", true)
     end
 
+    def title_sets
+      return @sets if @sets
+
+      @sets = []
+      sets_regexp = /\s*Title (\d) has (\d*) chapter/
+      info.split("\n").each do |line|
+        if line =~ sets_regexp
+          @sets << { title: $1.to_i, chapter: $2.to_i }
+        end
+      end
+      @sets
+    end
+
     def rip
     end
   end

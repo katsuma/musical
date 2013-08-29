@@ -156,4 +156,34 @@ EOM
       end
     end
   end
+
+  describe '#title_sets' do
+    subject { dvd.title_sets }
+    let(:info) do
+      <<"EOM"
+Title Sets:
+
+        Title set 1
+                The aspect ratio of title set 1 is 16:9
+                Title set 1 has 1 angle
+                Title set 1 has 1 audio track
+                Title set 1 has 0 subpicture channels
+
+                Title included in title set 1 is
+                        Title 1:
+                                Title 1 has 15 chapters
+                                Title 1 has 2 audio channels
+EOM
+    end
+    let(:dvd) { DVD.instance }
+
+    before { dvd.should_receive(:info).and_return(info) }
+
+    it 'returns each pair of title and chapter data' do
+      expect(subject).to be_an Array
+      expect(subject.size).to eq(1)
+      expect(subject.first[:title]).to eq(1)
+      expect(subject.first[:chapter]).to eq(15)
+    end
+  end
 end
