@@ -7,7 +7,7 @@ module Musical
     include Musical::Util
     extend Musical::Util
 
-    attr_accessor :title, :artist, :info
+    attr_accessor :title, :artist
 
     @@dev = nil
 
