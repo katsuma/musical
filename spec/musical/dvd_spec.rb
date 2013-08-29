@@ -128,7 +128,7 @@ EOM
 
     context 'when block is given' do
       subject { DVD.load { |dvd| dvd.artist = 'some artist' }  }
-      before { DVD.should_receive(:detect).and_return('/dev/some/path') }
+      before { DVD.should_receive(:detect).and_return('/dev/path') }
       it 'calls proc object' do
         subject
         expect(DVD.instance.artist).to eq('some artist')
@@ -136,4 +136,24 @@ EOM
     end
   end
 
+  describe '#info' do
+    subject { dvd.info }
+    let(:dvd) { DVD.instance }
+
+    context 'when DVD.dev is not set' do
+      before { DVD.dev = nil }
+      it 'raises an RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when DVD.dev is set' do
+      before { DVD.dev = '/dev/path' }
+      let(:info_data) { 'dvd data' }
+      it 'returns DVD disk data' do
+        dvd.should_receive(:execute_command).with("dvdbackup --input='/dev/path'", true).and_return(info_data)
+        expect(subject).to eq(info_data)
+      end
+    end
+  end
 end

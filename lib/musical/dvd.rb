@@ -4,9 +4,10 @@ require 'singleton'
 module Musical
   class DVD
     include Singleton
+    include Musical::Util
     extend Musical::Util
 
-    attr_accessor :title, :artist
+    attr_accessor :title, :artist, :info
 
     @@dev = nil
 
@@ -46,6 +47,14 @@ module Musical
       if block_given?
         yield(dvd)
       end
+    end
+
+    def info
+      raise RuntimeError.new 'Not detect DVD' unless @@dev
+      @info ||= execute_command("dvdbackup --input='#{@@dev}'", true)
+    end
+
+    def rip
     end
   end
 end
