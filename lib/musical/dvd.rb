@@ -9,65 +9,97 @@ module Musical
 
     attr_accessor :title, :artist
 
-    @@dev = nil
+    @@device_path = nil
+
+    DETECT_ERROR_MESSAGE = 'Not detect DVD, Try `DVD.load` and check your drive device path.'
+    DRIVE_NOT_FOUND_MESSAGE = 'DVD drive is not found.'
+    DVD_NOT_INSERTED_MESSAGE = 'DVD is not inserted.'
 
     def self.detect
       drutil_out = execute_command('drutil status')
 
-      raise RuntimeError.new 'DVD drive is not found' unless drutil_out
-      raise RuntimeError.new 'DVD is not inserted'   unless drutil_out.include?('Name:')
+      raise RuntimeError.new DRIVE_NOT_FOUND_MESSAGE  unless drutil_out
+      raise RuntimeError.new DVD_NOT_INSERTED_MESSAGE unless drutil_out.include?('Name:')
 
       file_system = drutil_out.split("\n").select do |line|
         line.include?('Name:')
       end.first.match(/Name: (.+)/)[1]
-
-      df_out = execute_command('df -H -a')
-      df_out.split("\n").select do |line|
-        line.include?(file_system)
-      end.first.gsub(/( ){2,}+/, "\t").split("\t").last
     end
 
-    def self.dev=(dev)
-      @@dev = dev
+    def self.device_path=(device_path)
+      @@device_path = device_path
     end
 
-    def self.dev
-      @@dev
+    def self.device_path
+      @@device_path
     end
 
     def self.load(options = {})
-      unless @@dev
-        @@dev = options[:dev] || self.detect
+      if @@device_path.nil? || options[:forcibly]
+        @@device_path = options[:device_path] || self.detect
       end
 
       dvd = DVD.instance
-      dvd.title = options[:title] if options[:title]
-      dvd.artist = options[:artist] if options[:artist]
+      dvd.title = options[:title] || Musical.configuration.title
+      dvd.artist = options[:artist] || Musical.configuration.artist
 
       if block_given?
         yield(dvd)
       end
+
+      dvd.info
     end
 
     def info
-      raise RuntimeError.new 'Not detect DVD' unless @@dev
-      @info ||= execute_command("dvdbackup --input='#{@@dev}'", true)
+      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@device_path
+
+      return @info if @info
+
+      @info = execute_command("dvdbackup --info --input='#{@@device_path}'", true)
+      raise RuntimeError.new DETECT_ERROR_MESSAGE if @info.empty?
+      @info
     end
 
     def title_sets
-      return @sets if @sets
+      return @title_sets if @title_sets
 
-      @sets = []
-      sets_regexp = /\s*Title (\d) has (\d*) chapter/
-      info.split("\n").each do |line|
-        if line =~ sets_regexp
-          @sets << { title: $1.to_i, chapter: $2.to_i }
+      @title_sets = [].tap do |sets|
+        sets_regexp = /\s*Title (\d) has (\d*) chapter/
+        info.split("\n").each do |line|
+          if line =~ sets_regexp
+            sets << { title: $1.to_i, chapter: $2.to_i }
+          end
         end
       end
-      @sets
     end
 
     def rip
+      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@device_path
+
+      base_dir = Musical.configuration.output
+      title_name = self.title.gsub(/ |\//, '_')
+      FileUtils.mkdir_p "#{base_dir}/#{title_name}"
+
+      title_sets.each do |title_set|
+        title_index_name = "TITLE_#{title_set[:title]}"
+        saved_dir = "#{base_dir}/#{title_index_name}/#{title_index_dir}"
+        FileUtils.mkdir_p saved_dir
+
+        (1..title_set[:chapter]).map do |chapter_index|
+          commands = []
+          commands << 'dvdbackup'
+          commands << "--name=#{title_name}"
+          commands << "--input='#{@@device_path}'"
+          commands << "--title=#{title_index_name}"
+          commands << "--start=#{chapter_index}"
+          commands << "--end=#{chapter_index}"
+          commands << "--output='#{saved_dir}/#{chapter_index}'"
+
+          execute_command(commands.join(' '))
+
+          Chapter.new()
+        end
+      end
     end
   end
 end
