@@ -100,16 +100,28 @@ EOM
 
     context 'when options are given' do
       subject { DVD.load(options) }
-      let(:options) { { device_path: '/dev/path', title: 'some title' } }
+      context 'and if option does not have `forcibly` key' do
+        let(:options) { { device_path: '/dev/path', title: 'some title' } }
 
-      it 'sets dev path by given option' do
-        subject
-        expect(DVD.device_path).to eq('/dev/path')
+        it 'sets dev path by given option' do
+          subject
+          expect(DVD.device_path).to eq('/dev/path')
+        end
+
+        it 'sets title by given option' do
+          subject
+          expect(DVD.instance.title).to eq('some title')
+        end
       end
 
-      it 'sets title by given option' do
-        subject
-        expect(DVD.instance.title).to eq('some title')
+      context 'and if option has `forcibly` key' do
+        let(:options) { { forcibly: true } }
+        before { DVD.device_path = '/dev/some/path' }
+
+        it 'calls DVD.detect forcibly even if device path is already set' do
+          DVD.should_receive(:detect).and_return('/dev/some/path')
+          subject
+        end
       end
     end
 
