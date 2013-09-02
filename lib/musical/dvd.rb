@@ -9,7 +9,7 @@ module Musical
 
     attr_accessor :title, :artist
 
-    @@device_path = nil
+    @@path = nil
 
     DETECT_ERROR_MESSAGE = 'Not detect DVD, Try `DVD.load` and check your drive device path.'
     DRIVE_NOT_FOUND_MESSAGE = 'DVD drive is not found.'
@@ -26,17 +26,17 @@ module Musical
       end.first.match(/Name: (.+)/)[1]
     end
 
-    def self.device_path=(device_path)
-      @@device_path = device_path
+    def self.path=(path)
+      @@path = path
     end
 
-    def self.device_path
-      @@device_path
+    def self.path
+      @@path
     end
 
     def self.load(options = {})
-      if @@device_path.nil? || options[:forcibly]
-        @@device_path = options[:device_path] || self.detect
+      if @@path.nil? || options[:forcibly]
+        @@path = options[:path] || self.detect
       end
 
       dvd = DVD.instance
@@ -51,11 +51,11 @@ module Musical
     end
 
     def info
-      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@device_path
+      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@path
 
       return @info if @info
 
-      @info = execute_command("dvdbackup --info --input='#{@@device_path}'", true)
+      @info = execute_command("dvdbackup --info --input='#{@@path}'", true)
       raise RuntimeError.new DETECT_ERROR_MESSAGE if @info.empty?
       @info
     end
@@ -74,7 +74,7 @@ module Musical
     end
 
     def rip
-      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@device_path
+      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@path
 
       base_dir = Musical.configuration.output
       title_name = self.title.gsub(/ |\//, '_')
@@ -89,7 +89,7 @@ module Musical
           commands = []
           commands << 'dvdbackup'
           commands << "--name=#{title_name}"
-          commands << "--input='#{@@device_path}'"
+          commands << "--input='#{@@path}'"
           commands << "--title=#{title_index_name}"
           commands << "--start=#{chapter_index}"
           commands << "--end=#{chapter_index}"

@@ -58,16 +58,16 @@ EOM
     end
   end
 
-  describe '.device_path' do
-    subject { DVD.device_path }
-    context 'device_path class property is not set' do
+  describe '.path' do
+    subject { DVD.path }
+    context 'path class property is not set' do
       it 'returns nil' do
         expect(subject).to eq(nil)
       end
     end
 
-    context 'device_path class property is set' do
-      before{ DVD.device_path = '/dev/path' }
+    context 'path class property is set' do
+      before{ DVD.path = '/dev/path' }
       it 'returns property value' do
         expect(subject).to eq('/dev/path')
       end
@@ -75,14 +75,14 @@ EOM
   end
 
   describe '.load' do
-    before { DVD.device_path = nil }
+    before { DVD.path = nil }
     before { DVD.any_instance.should_receive(:info).and_return('info data') }
 
     context 'when options are not given' do
       subject { DVD.load }
 
-      context 'and if device_path is set' do
-        before { DVD.device_path = '/dev/some/path' }
+      context 'and if path is set' do
+        before { DVD.path = '/dev/some/path' }
         it 'does not call DVD.detect' do
           DVD.should_not_receive(:detect)
           subject
@@ -93,7 +93,7 @@ EOM
         it 'sets dev path by DVD.detect' do
           DVD.should_receive(:detect).and_return('/dev/some/path')
           subject
-          expect(DVD.device_path).to eq('/dev/some/path')
+          expect(DVD.path).to eq('/dev/some/path')
         end
       end
     end
@@ -101,11 +101,11 @@ EOM
     context 'when options are given' do
       subject { DVD.load(options) }
       context 'and if option does not have `forcibly` key' do
-        let(:options) { { device_path: '/dev/path', title: 'some title' } }
+        let(:options) { { path: '/dev/path', title: 'some title' } }
 
         it 'sets dev path by given option' do
           subject
-          expect(DVD.device_path).to eq('/dev/path')
+          expect(DVD.path).to eq('/dev/path')
         end
 
         it 'sets title by given option' do
@@ -116,7 +116,7 @@ EOM
 
       context 'and if option has `forcibly` key' do
         let(:options) { { forcibly: true } }
-        before { DVD.device_path = '/dev/some/path' }
+        before { DVD.path = '/dev/some/path' }
 
         it 'calls DVD.detect forcibly even if device path is already set' do
           DVD.should_receive(:detect).and_return('/dev/some/path')
@@ -140,14 +140,14 @@ EOM
     let(:dvd) { DVD.instance }
 
     context 'when DVD.dev is not set' do
-      before { DVD.device_path = nil }
+      before { DVD.path = nil }
       it 'raises an RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
       end
     end
 
     context 'when DVD.dev is set' do
-      before { DVD.device_path = '/dev/path' }
+      before { DVD.path = '/dev/path' }
       let(:info_data) { 'dvd data' }
       it 'returns DVD disk data' do
         dvd.should_receive(:execute_command).with("dvdbackup --info --input='/dev/path'", true).and_return(info_data)
