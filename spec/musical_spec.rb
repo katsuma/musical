@@ -49,5 +49,9 @@ describe Musical do
     it 'returns a subclass of OpenStruct' do
       expect(subject).to be_an OpenStruct
     end
+
+    it 'includes working directory' do
+      expect(subject.working_dir).to eq(File.join(File.expand_path('~'), '.musical'))
+    end
   end
 end
