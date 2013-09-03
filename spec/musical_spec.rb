@@ -3,7 +3,7 @@ require 'spec_helper'
 require 'musical'
 
 describe Musical do
-  describe '#setup' do
+  describe '#setup', fakefs: true do
     subject(:setup) { Musical.setup }
     before { Musical.should_receive(:check_env).and_return(true) }
 

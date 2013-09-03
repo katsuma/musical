@@ -21,6 +21,10 @@ module Musical
   def setup
     return unless check_env
 
+    # init working directory
+    working_dir = File.join(File.expand_path('~'), '.musical')
+    FileUtils.mkdir_p(working_dir) unless File.exist?(working_dir)
+
     # parse options
     options = Trollop::options do
       version "Musical #{Musical::VERSION}"
