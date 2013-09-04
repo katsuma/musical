@@ -10,7 +10,7 @@ describe Musical::DVD::Chapter do
       let(:vob_path) { nil }
       let(:options) { {} }
       it 'raises an ArgumentError' do
-        expect{ subject}.to raise_error(ArgumentError)
+        expect{ subject }.to raise_error(ArgumentError)
       end
     end
 
@@ -18,15 +18,15 @@ describe Musical::DVD::Chapter do
       let(:vob_path) { '/path/to/foo.vob' }
       let(:options) { {} }
       it 'returns an instance of Chapter' do
-        expect(subject).to be_a(Musical::DVD::Chapter)
+        expect(subject).to be_a(described_class)
       end
     end
   end
 
-  describe '#to_wav_path' do
-    subject { chapter.to_wav_path }
+  describe '#wav_path' do
+    subject { chapter.wav_path }
 
-    let(:chapter) { Musical::DVD::Chapter.new(vob_path, chapter_number: 10) }
+    let(:chapter) { described_class.new(vob_path, chapter_number: 10) }
     let(:vob_path) { '/path/to/foo.vob' }
     let(:wav_path) { "#{Musical.configuration.output}/chapter_#{chapter.chapter_number}.wav" }
 
@@ -34,6 +34,23 @@ describe Musical::DVD::Chapter do
 
     it 'returns wav file path which is converted' do
       expect(subject).to eq(wav_path)
+    end
+  end
+
+  describe '#delete_wav' do
+    subject { chapter.delete_wav }
+
+    let(:chapter) { described_class.new(vob_path, chapter_number: 10) }
+    let(:vob_path) { '/path/to/foo.vob' }
+    let(:wav_path) { '/tmp/foo.wav' }
+
+    before do
+      chapter.should_receive(:wav_path).twice.and_return(wav_path)
+      FileUtils.touch(wav_path)
+    end
+
+    it 'deletes wav file', fakefs: true do
+      expect{ subject }.to change { File.exist?(wav_path) }.from(true).to(false)
     end
   end
 end

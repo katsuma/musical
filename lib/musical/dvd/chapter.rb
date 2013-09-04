@@ -16,7 +16,7 @@ module Musical
       @chapter_number = options[:chpter_number] || DEFAULT_CHAPTER_NUMBER
     end
 
-    def to_wav_path
+    def wav_path
       return @wav_path if @wav_path
 
       save_dir = Musical.configuration.output
@@ -25,6 +25,10 @@ module Musical
       command = "ffmpeg -i #{@vob_path} #{@wav_path}"
       execute_command(command, true)
       @wav_path
+    end
+
+    def delete_wav
+      FileUtils.rm_f(wav_path) if wav_path
     end
   end
 end
