@@ -3,5 +3,31 @@
 require 'musical'
 include Musical
 
-opts = Musical.setup
-DVD.new opts
+Musical.setup
+
+dvd_options = {
+  title: Musical.configuration.title,
+  artist: Musical.configuration.artist,
+  dev: Musical.configuration.dev
+}
+
+DVD.load(dvd_options) do |dvd|
+  chapters = dvd.rip
+
+  chapters.each do |chapter|
+    wav = chapter.to_wav
+    track = Itunes::Player.add(wav.path)
+
+    converted_track = track.convert
+    converted_track.update_attributes(
+      name: chapter.name,
+      album: dvd.title,
+      artist: dvd.artist,
+      track_count: chapters.size,
+      track_number: chapter.chapter_number,
+    )
+
+    wav.delete
+    track.delete
+  end
+end
