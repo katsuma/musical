@@ -9,6 +9,7 @@ require 'musical/util'
 require 'musical/version'
 require 'musical/dvd'
 require 'musical/dvd/chapter'
+require 'musical/dvd/wav'
 
 module Musical
   extend Musical::Util

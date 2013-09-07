@@ -73,31 +73,31 @@ module Musical
       end
     end
 
+    def vob_path
+      find_command = "find '#{Musical.configuration.working_dir}' -name '*.VOB'"
+      execute_command(find_command)
+    end
+    private :vob_path
+
     def rip
       raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@path
 
-      base_dir = Musical.configuration.output
-      title_name = self.title.gsub(/ |\//, '_')
-      FileUtils.mkdir_p "#{base_dir}/#{title_name}"
+      save_dir = Musical.configuration.output
+      FileUtils.mkdir_p save_dir
 
       title_sets.each do |title_set|
-        title_index_name = "TITLE_#{title_set[:title]}"
-        saved_dir = "#{base_dir}/#{title_index_name}/#{title_index_dir}"
-        FileUtils.mkdir_p saved_dir
-
         (1..title_set[:chapter]).map do |chapter_index|
           commands = []
           commands << 'dvdbackup'
-          commands << "--name=#{title_name}"
           commands << "--input='#{@@path}'"
-          commands << "--title=#{title_index_name}"
           commands << "--start=#{chapter_index}"
           commands << "--end=#{chapter_index}"
-          commands << "--output='#{saved_dir}/#{chapter_index}'"
-
+          commands << "--output='#{Musical.configuration.working_dir}'"
           execute_command(commands.join(' '))
 
-          Chapter.new()
+          vob_save_path = "#{save_dir}/TITLE_#{title_set}_#{chapter_index}.VOB"
+          FileUtils.mv(vob_path, vob_save_path)
+          Chapter.new(vob_save_path)
         end
       end
     end

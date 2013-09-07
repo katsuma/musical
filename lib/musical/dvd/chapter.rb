@@ -16,19 +16,12 @@ module Musical
       @chapter_number = options[:chpter_number] || DEFAULT_CHAPTER_NUMBER
     end
 
-    def wav_path
-      return @wav_path if @wav_path
+    def to_wav(wav_path = "#{Musical.configuration.output}/chapter_#{@chapter_number}.wav")
+      return @wav if @wav
 
-      save_dir = Musical.configuration.output
-      @wav_path = "#{save_dir}/chapter_#{@chapter_number}.wav"
-
-      command = "ffmpeg -i #{@vob_path} #{@wav_path}"
+      command = "ffmpeg -i #{@vob_path} #{wav_path}"
       execute_command(command, true)
-      @wav_path
-    end
-
-    def delete_wav
-      FileUtils.rm_f(wav_path) if wav_path
+      DVD::Wav.new(wav_path)
     end
   end
 end

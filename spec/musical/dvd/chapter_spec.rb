@@ -23,34 +23,24 @@ describe Musical::DVD::Chapter do
     end
   end
 
-  describe '#wav_path' do
-    subject { chapter.wav_path }
-
-    let(:chapter) { described_class.new(vob_path, chapter_number: 10) }
-    let(:vob_path) { '/path/to/foo.vob' }
-    let(:wav_path) { "#{Musical.configuration.output}/chapter_#{chapter.chapter_number}.wav" }
-
-    before { chapter.should_receive(:execute_command).with("ffmpeg -i #{vob_path} #{wav_path}", true) }
-
-    it 'returns wav file path which is converted' do
-      expect(subject).to eq(wav_path)
-    end
-  end
-
-  describe '#delete_wav' do
-    subject { chapter.delete_wav }
+  describe '#to_wav' do
+    subject { chapter.to_wav(wav_path) }
 
     let(:chapter) { described_class.new(vob_path, chapter_number: 10) }
     let(:vob_path) { '/path/to/foo.vob' }
     let(:wav_path) { '/tmp/foo.wav' }
 
     before do
-      chapter.should_receive(:wav_path).twice.and_return(wav_path)
-      FileUtils.touch(wav_path)
+      chapter.should_receive(:execute_command).
+        with("ffmpeg -i #{vob_path} #{wav_path}", true).
+        and_return(FileUtils.touch(wav_path))
     end
 
-    it 'deletes wav file', fakefs: true do
-      expect{ subject }.to change { File.exist?(wav_path) }.from(true).to(false)
+    after { subject.delete }
+
+    it 'returns wav file which is converted', fakefs: true do
+      expect(subject).to be_a(Musical::DVD::Wav)
+      expect(subject.path).to eq(wav_path)
     end
   end
 end
