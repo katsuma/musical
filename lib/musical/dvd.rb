@@ -75,7 +75,7 @@ module Musical
 
     def vob_path
       find_command = "find '#{Musical.configuration.working_dir}' -name '*.VOB'"
-      execute_command(find_command)
+      execute_command(find_command).split("\n").first
     end
     private :vob_path
 
@@ -84,9 +84,10 @@ module Musical
 
       save_dir = Musical.configuration.output
       FileUtils.mkdir_p save_dir
+      chapters = []
 
       title_sets.each do |title_set|
-        (1..title_set[:chapter]).map do |chapter_index|
+        chapters << (1..title_set[:chapter]).map do |chapter_index|
           commands = []
           commands << 'dvdbackup'
           commands << "--input='#{@@path}'"
@@ -95,11 +96,12 @@ module Musical
           commands << "--output='#{Musical.configuration.working_dir}'"
           execute_command(commands.join(' '))
 
-          vob_save_path = "#{save_dir}/TITLE_#{title_set}_#{chapter_index}.VOB"
+          vob_save_path = "#{save_dir}/TITLE_#{title_set[:title]}_#{chapter_index}.VOB"
           FileUtils.mv(vob_path, vob_save_path)
           Chapter.new(vob_save_path)
         end
       end
+      chapters.flatten
     end
   end
 end

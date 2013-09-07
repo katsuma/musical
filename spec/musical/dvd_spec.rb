@@ -89,8 +89,8 @@ EOM
         end
       end
 
-      context 'and if dev path is not set' do
-        it 'sets dev path by DVD.detect' do
+      context 'and if DVD path is not set' do
+        it 'sets path by DVD.detect' do
           DVD.should_receive(:detect).and_return('/dev/some/path')
           subject
           expect(DVD.path).to eq('/dev/some/path')
@@ -103,7 +103,7 @@ EOM
       context 'and if option does not have `forcibly` key' do
         let(:options) { { path: '/dev/path', title: 'some title' } }
 
-        it 'sets dev path by given option' do
+        it 'sets path by given option' do
           subject
           expect(DVD.path).to eq('/dev/path')
         end
@@ -118,7 +118,7 @@ EOM
         let(:options) { { forcibly: true } }
         before { DVD.path = '/dev/some/path' }
 
-        it 'calls DVD.detect forcibly even if device path is already set' do
+        it 'calls DVD.detect forcibly even if path is already set' do
           DVD.should_receive(:detect).and_return('/dev/some/path')
           subject
         end
@@ -139,14 +139,14 @@ EOM
     subject { dvd.info }
     let(:dvd) { DVD.instance }
 
-    context 'when DVD.dev is not set' do
+    context 'when DVD.path is not set' do
       before { DVD.path = nil }
       it 'raises an RuntimeError' do
         expect { subject }.to raise_error(RuntimeError)
       end
     end
 
-    context 'when DVD.dev is set' do
+    context 'when DVD.path is set' do
       before { DVD.path = '/dev/path' }
       let(:info_data) { 'dvd data' }
       it 'returns DVD disk data' do
@@ -183,6 +183,49 @@ EOM
       expect(subject.size).to eq(1)
       expect(subject.first[:title]).to eq(1)
       expect(subject.first[:chapter]).to eq(15)
+    end
+  end
+
+  describe '#rip' do
+    subject { dvd.rip }
+    let(:dvd) { DVD.instance }
+
+    context 'when DVD.path if not set' do
+      before { DVD.path = nil }
+      it 'raises an RuntimeError' do
+        expect { subject }.to raise_error(RuntimeError)
+      end
+    end
+
+    context 'when DVD.path is set' do
+      before { DVD.path = '/dev/path' }
+
+      let(:configuration) { OpenStruct.new(output: '/tmp/out', working_dir: '/tmp/working') }
+      let(:title_sets) { [{ title: 1, chapter: 3 }, { title: 2, chapter: 4 }] }
+      let(:vob_path) { '/tmp/working/foo.vob' }
+
+      def stub_methods
+        Musical.should_receive(:configuration).at_least(1).times.and_return(configuration)
+        dvd.should_receive(:title_sets).and_return(title_sets)
+        dvd.should_receive(:execute_command).at_least(1).with(/find (.)*/).and_return("#{vob_path}\n")
+        dvd.should_receive(:execute_command).at_least(1).with(/dvdbackup (.)*/) { FileUtils.touch(vob_path) }
+      end
+
+      before do
+        FileUtils.mkdir_p(configuration.output)
+        FileUtils.mkdir_p(configuration.working_dir)
+        stub_methods
+      end
+
+      after do
+        FileUtils.rm_rf(configuration.working_dir)
+        FileUtils.rm_rf(configuration.output)
+      end
+
+      it 'returns an array of chapter', fakefs: true do
+        expect(subject).to be_an Array
+        expect(subject.size).to eq(7)
+      end
     end
   end
 end
