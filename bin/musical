@@ -37,3 +37,8 @@ DVD.load(dvd_options) do |dvd|
     track.delete!
   end
 end
+
+if !Musical.configuration.ignore_convert_sound &&
+    !Musical.configuration.ignore_use_itunes
+  FileUtils.rm_f(Musical.configuration.output)
+end
