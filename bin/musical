@@ -22,7 +22,7 @@ DVD.load(dvd_options) do |dvd|
     wav = chapter.to_wav
     next if Musical.configuration.ignore_use_itunes
 
-    track = Itunes::Player.add(wav.path)
+    track = Itunes::Player.add(wav.expand_path)
 
     converted_track = track.convert
     converted_track.update_attributes(
