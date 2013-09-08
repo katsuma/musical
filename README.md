@@ -1,13 +1,14 @@
 # musical [![Build Status](https://travis-ci.org/katsuma/musical.png?branch=master)](https://travis-ci.org/katsuma/musical) [![Coverage Status](https://coveralls.io/repos/katsuma/musical/badge.png)](https://coveralls.io/r/katsuma/musical)
 
 `musical` is a simple tool for your favorite music DVD.
-You can rip vob file by DVD chapter, convert it to wav file and add it to your iTunes library.
+
+You can rip vob files by each DVD chapter, convert them to wav file and add them to your iTunes library.
 
 
 ## Install
 
 `musical` depends on `dvdbackup` and `ffmpeg`.
-To install them try this for example,
+To install them try this for example.
 
 ```sh
 brew install dvdbackup
@@ -42,6 +43,7 @@ Options:
 ```
 
 When you use iTunes, you should use `--title` and `--artist` options.
+
 They will help you to manage your music library easily.
 
 
@@ -54,5 +56,4 @@ They will help you to manage your music library easily.
 
 
 ## License
-
-musical is released under the MIT License.
+`musical` is released under the MIT License.
