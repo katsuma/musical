@@ -1,141 +1,112 @@
+# coding: utf-8
+require 'singleton'
+
 module Musical
   class DVD
-    attr_accessor :opts
+    include Singleton
+    include Musical::Util
+    extend Musical::Util
 
-    MountainLionVersion = [10, 8]
+    attr_accessor :title, :artist
+
+    @@path = nil
+
+    DETECT_ERROR_MESSAGE = 'Not detect DVD, Try `DVD.load` and check your drive device path.'
+    DRIVE_NOT_FOUND_MESSAGE = 'DVD drive is not found.'
+    DVD_NOT_INSERTED_MESSAGE = 'DVD is not inserted.'
 
     def self.detect
-      dev_infos = `df -h -l`.split("\n")
-      candidates = []
-      dev_infos.each do |dev_info|
-        if (`sw_vers -productVersion`.split(".").map(&:to_i) <=> MountainLionVersion) < 0
-          /([\w\/]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\d%]+)\s+(.*)$/ =~ dev_info
-          mounted = $6
-        else
-          /^([\w\/]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\w\.]+)\s+([\d%]+)\s+(\d+)\s+(\d+)\s+([\d%]+)\s+(.*)$/ =~ dev_info
-          mounted = $9
-        end
-        file_system = $1
-        capacity = $5
-        if capacity == "100%" && mounted.include?("/Volumes") && !(mounted.include?("MobileBackups"))
-          candidates << mounted
-        end
+      drutil_out = execute_command('drutil status')
+
+      raise RuntimeError.new DRIVE_NOT_FOUND_MESSAGE  unless drutil_out
+      raise RuntimeError.new DVD_NOT_INSERTED_MESSAGE unless drutil_out.include?('Name:')
+
+      file_system = drutil_out.split("\n").select do |line|
+        line.include?('Name:')
+      end.first.match(/Name: (.+)/)[1]
+    end
+
+    def self.path=(path)
+      @@path = path
+    end
+
+    def self.path
+      @@path
+    end
+
+    def self.load(options = {})
+      if @@path.nil? || options[:forcibly]
+        @@path = options[:path] || self.detect
       end
 
-      raise "Not detect DVD device" if candidates.empty?
-      candidates
-    end
+      dvd = DVD.instance
+      dvd.title = options[:title] || Musical.configuration.title
+      dvd.artist = options[:artist] || Musical.configuration.artist
 
-    def initialize(options={})
-      @opts = options
+      if block_given?
+        yield(dvd)
+      end
 
-      return puts info if @opts[:info]
-
-      rip_by_chapter
-      convert_sound unless @opts[:ignore_convert_sound]
-      to_itunes unless @opts[:ignore_use_itunes]
-    end
-
-    def dev
-      @_dev ||= DVD.detect.first
+      dvd.info
     end
 
     def info
-      raise "Not detect DVD device" if dev.empty?
-      @_info ||= `dvdbackup --input='#{dev}' --info 2>/dev/null`
+      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@path
+
+      return @info if @info
+
+      @info = execute_command("dvdbackup --info --input='#{@@path}'", true)
+      raise RuntimeError.new DETECT_ERROR_MESSAGE if @info.empty?
+      @info
     end
 
-    def title_with_chapters
-      return @_title_chapters unless @_title_chapters.nil?
+    def title_sets
+      return @title_sets if @title_sets
 
-      @_title_chapters = []
-      info_str = info.split("\n")
-      info_str.each_with_index do |line, index|
-        if line =~ /\s*Title (\d):$/
-          @_title_chapters << { :title => $1.to_i, :line => index }
-        end
-      end
-
-      @_title_chapters.each do |title_chapter|
-        line = title_chapter[:line]
-        if info_str[line + 1] =~ /\s*Title (\d) has (\d*) chapter/
-          title_chapter[:chapter] = $2.to_i
-          title_chapter.delete(:line)
-        end
-      end
-      @_title_chapters
-    end
-
-    def rip_by_chapter
-      task_message "Ripping"
-
-      pbar = ProgressBar.new "Ripping", chapter_size
-      title_with_chapters.each_with_index do |title_chapter, title_index|
-        ripped_dir_base = "#{@opts[:output]}"
-        saved_dir = "#{ripped_dir_base}/#{@opts[:trim_title]}/title_#{title_index+1}"
-        FileUtils.mkdir_p "#{saved_dir}"
-
-        1.upto title_chapter[:chapter] do |chapter|
-          `dvdbackup --name=#{@opts[:trim_title]} --input='#{dev}' --title=#{title_index+1} --start=#{chapter} --end=#{chapter} --output='#{ripped_dir_base}_#{title_index}_#{chapter}' 2>/dev/null`
-          pbar.inc
-          # moved file
-          vob_path = `find '#{ripped_dir_base}_#{title_index}_#{chapter}' -name "*.VOB"`.chomp
-          vob_path.split.each do |vob|
-            FileUtils.mv vob, "#{saved_dir}/chapter_#{chapter}.VOB"
+      @title_sets = [].tap do |sets|
+        sets_regexp = /\s*Title (\d) has (\d*) chapter/
+        info.split("\n").each do |line|
+          if line =~ sets_regexp
+            sets << { title: $1.to_i, chapter: $2.to_i }
           end
-          FileUtils.rm_rf "#{ripped_dir_base}_#{title_index}_#{chapter}"
         end
       end
-      pbar.finish
     end
 
-    def convert_sound
-      task_message "Converting"
+    def vob_path
+      find_command = "find '#{Musical.configuration.working_dir}' -name '*.VOB'"
+      execute_command(find_command).split("\n").first
+    end
+    private :vob_path
 
-      pbar = ProgressBar.new "Converting", chapter_size
-      title_with_chapters.each_with_index do |title_chapter, title_index|
-        ripped_dir_base = "#{@opts[:output]}"
-        saved_dir = "#{ripped_dir_base}/#{@opts[:trim_title]}/title_#{title_index+1}"
+    def rip
+      raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@path
+      save_dir = Musical.configuration.output
+      FileUtils.mkdir_p save_dir
 
-        1.upto title_chapter[:chapter] do |chapter|
-          `ffmpeg -i #{saved_dir}/chapter_#{chapter}.VOB #{saved_dir}/chapter_#{chapter}.wav 2>/dev/null`
-          FileUtils.rm_f "#{saved_dir}/chapter_#{chapter}.VOB"
-          pbar.inc
+      chapter_size = title_sets.inject(0){ |size, set| size + set[:chapter] }
+      progress_bar = ProgressBar.create(title: 'Ripping', total: chapter_size, format: '%a %B %p%% %t')
+      chapters = []
+
+      title_sets.each do |title_set|
+        chapters << (1..title_set[:chapter]).map do |chapter_index|
+          commands = []
+          commands << 'dvdbackup'
+          commands << "--input='#{@@path}'"
+          commands << "--title='#{title_set[:title]}'"
+          commands << "--start=#{chapter_index}"
+          commands << "--end=#{chapter_index}"
+          commands << "--output='#{Musical.configuration.working_dir}'"
+          execute_command(commands.join(' '), true)
+
+          progress_bar.increment
+
+          vob_save_path = "#{save_dir}/TITLE_#{title_set[:title]}_#{chapter_index}.VOB"
+          FileUtils.mv(vob_path, vob_save_path)
+          Chapter.new(vob_save_path, title_number: title_set[:title], chapter_number: chapter_index)
         end
       end
-      pbar.finish
+      chapters.flatten
     end
-
-    def to_itunes
-      task_message "To iTunes"
-
-      pbar = ProgressBar.new "To iTunes", chapter_size
-      its = ITunes.new
-
-      title_with_chapters.each_with_index do |title_chapter, title_index|
-        ripped_dir_base = "#{@opts[:output]}"
-        saved_dir = "#{ripped_dir_base}/#{@opts[:trim_title]}/title_#{title_index+1}"
-
-        options = { :album => @opts[:title], :artist => @opts[:artist], :track_count => title_chapter[:chapter]}
-        1.upto title_chapter[:chapter] do |chapter|
-          its.add("#{saved_dir}/chapter_#{chapter}.wav", options.merge(:track_number => chapter))
-          pbar.inc
-        end
-      end
-      FileUtils.rm_rf @opts[:output]
-      pbar.finish
-    end
-
-    def chapter_size
-      @_chapter_size ||= title_with_chapters.inject(0){ |count, t| count + t[:chapter]}
-    end
-    private :chapter_size
-
-    def task_message(task)
-      raise "Not found any titles and chapters" if title_with_chapters.size == 0 && chapter_size == 0
-      puts "#{task} #{title_with_chapters.size} titles, #{chapter_size} chapters"
-    end
-    private :task_message
-
   end
 end

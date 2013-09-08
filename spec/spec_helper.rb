@@ -1,12 +1,23 @@
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'rspec'
-require 'musical'
+# coding: utf-8
 
-# Requires supporting files with custom matchers and macros, etc,
-# in ./support/ and its subdirectories.
-Dir["#{File.dirname(__FILE__)}/support/**/*.rb"].each {|f| require f}
+require 'bundler'
+require 'fakefs/spec_helpers'
+require 'simplecov'
+require 'coveralls'
+
+Bundler.setup(:default, :development)
 
 RSpec.configure do |config|
-  
+  config.color_enabled = true
+  config.tty = true
+  #config.formatter = :documentation
+  config.include FakeFS::SpecHelpers, fakefs: true
+end
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  Coveralls::SimpleCov::Formatter
+]
+SimpleCov.start do
+ add_filter '/spec/'
 end
