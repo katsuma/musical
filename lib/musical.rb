@@ -1,40 +1,48 @@
-require 'rubygems'
 require 'trollop'
-require 'progressbar'
+require 'ruby-progressbar'
 require 'fileutils'
-require 'appscript'
+require 'open3'
+require 'ostruct'
+require 'itunes-client'
 
+require 'musical/configuration'
+require 'musical/util'
+require 'musical/version'
 require 'musical/dvd'
-require 'musical/itunes'
+require 'musical/dvd/chapter'
+require 'musical/dvd/wav'
 
 module Musical
-  def setup
-    # check env
-    ['dvdbackup', 'ffmpeg'].each do |app|
-      if `which #{app}`.empty?
-        raise RuntimeError, "\n\n'#{app}' is not installed.\n\ntry:\n  brew install #{app}\n\n"
-      end
-    end
+  extend Musical::Util
 
-    version = open(File.join(File.dirname(__FILE__), "..", "VERSION")){ |f| f.gets }
+  def configuration
+    Configuration.config || Musical.setup
+  end
+  module_function :configuration
+
+  def setup
+    return unless check_env
+
+    # init working directory
+    working_dir = File.join(File.expand_path('~'), '.musical')
+    FileUtils.mkdir_p(working_dir) unless File.exist?(working_dir)
 
     # parse options
-    opts = Trollop::options do
-      version "Musical #{version}"
-      opt :info, "Show your DVD data", :type => :boolean
-      opt :ignore_convert_sound, "Rip data only, NOT convert them to wav file", :type => :boolean
-      opt :ignore_use_itunes, "NOT add ripped files to iTunes and encode them", :type => :boolean
-      opt :dev, "Set location of DVD device"
-      opt :title, "Set DVD title", :default => 'LIVE'
-      opt :artist, "Set DVD artist", :default => 'Artist'
-      opt :output, "Set location of ripped data", :default => 'ripped'
+    options = Trollop::options do
+      version "Musical #{Musical::VERSION}"
+      opt :info, "Show your DVD data", type: :boolean
+      opt :ignore_convert_sound, "Rip data only, NOT convert them to wav file", type: :boolean
+      opt :ignore_use_itunes, "NOT add ripped files to iTunes and encode them", type: :boolean
+      opt :path, "Set device path of DVD", type: :string
+      opt :title, "Set DVD title", type: :string, default: 'LIVE'
+      opt :artist, "Set DVD artist", type: :string, default: 'Artist'
+      opt :output, "Set location of ripped data", type: :string, default: 'ripped'
     end
 
-    # fix fox dvdbackup
-    opts[:trim_title] = opts[:title].gsub(" ", "_")
-    opts[:trim_artist] = opts[:artist].gsub(" ", "_")
+    configuration = Configuration.build(options.merge(working_dir: working_dir))
+    yield(configuration) if block_given?
 
-    opts
+    configuration
   end
-
+  module_function :setup
 end
