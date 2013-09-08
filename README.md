@@ -1,19 +1,21 @@
 # musical
 
-musical is a simple tool for your favorite music DVD.
+`musical` is a simple tool for your favorite music DVD.
 You can rip vob file by DVD chapter, convert it to wav file and add it to your iTunes library.
 
 
 ## Install
 
-musical depends on dvdbackup and ffmpeg. To install them try this for example,
+`musical` depends on `dvdbackup` and `ffmpeg`.
+To install them try this for example,
 
 ```sh
 brew install dvdbackup
 brew install ffmpeg
 ```
 
-And install gem
+And install gem.
+
 ```sh
 gem install musical
 ```
@@ -39,7 +41,8 @@ Options:
                   --help, -h:   Show this message
 ```
 
-When you use iTunes, you should use --title and --artist options. They will help you to manage your music library easily.
+When you use iTunes, you should use `--title` and `--artist` options.
+They will help you to manage your music library easily.
 
 
 ## Supported OS
@@ -48,32 +51,6 @@ When you use iTunes, you should use --title and --artist options. They will help
 ## Supported Ruby
 - 2.0.0
 - 1.9.3
-
-
-## FAQ
-
-### I cannot install ffmpeg.
-
-The latest Xcode doesn't include gcc. Install [gcc-4.2](https://github.com/kennethreitz/osx-gcc-installer).
-
-And try this.
-
-```sh
-brew install --use-gcc ffmpeg
-```
-
-### I got an error, /bin/sh: /usr/bin/pod2man: Permission denied
-
-/usr/bin/pod2man may not have execute permission.
-
-Try this.
-```sh
-sudo chmod +x /usr/bin/pod2man
-```
-
-### I got nothing 'musical --info'
-
-Your DVD may be copy-protected. Try [fairmount](http://www.metakine.com/products/fairmount/).
 
 
 ## License
