@@ -22,9 +22,9 @@ describe Musical do
       it { expect(setup[:ignore_use_itunes]).to be_true }
     end
 
-    context 'when argument `dev` is given' do
-      before { stub_const('ARGV', ['--dev=/dev/foo']) }
-      it { expect(setup[:dev]).to eq('/dev/foo') }
+    context 'when argument `path` is given' do
+      before { stub_const('ARGV', ['--path=/dev/foo']) }
+      it { expect(setup[:path]).to eq('/dev/foo') }
     end
 
     context 'when argument `title` is given' do

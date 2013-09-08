@@ -36,7 +36,7 @@ describe Musical::DVD::Chapter do
         and_return(FileUtils.touch(wav_path))
     end
 
-    after { subject.delete }
+    after { subject.delete! }
 
     it 'returns wav file which is converted', fakefs: true do
       expect(subject).to be_a(Musical::DVD::Wav)

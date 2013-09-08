@@ -81,9 +81,11 @@ module Musical
 
     def rip
       raise RuntimeError.new DETECT_ERROR_MESSAGE unless @@path
-
       save_dir = Musical.configuration.output
       FileUtils.mkdir_p save_dir
+
+      chapter_size = title_sets.inject(0){ |size, set| size + set[:chapter] }
+      progress_bar = ProgressBar.create(title: 'Ripping', total: chapter_size, format: '%a %B %p%% %t')
       chapters = []
 
       title_sets.each do |title_set|
@@ -91,14 +93,17 @@ module Musical
           commands = []
           commands << 'dvdbackup'
           commands << "--input='#{@@path}'"
+          commands << "--title='#{title_set[:title]}'"
           commands << "--start=#{chapter_index}"
           commands << "--end=#{chapter_index}"
           commands << "--output='#{Musical.configuration.working_dir}'"
-          execute_command(commands.join(' '))
+          execute_command(commands.join(' '), true)
+
+          progress_bar.increment
 
           vob_save_path = "#{save_dir}/TITLE_#{title_set[:title]}_#{chapter_index}.VOB"
           FileUtils.mv(vob_path, vob_save_path)
-          Chapter.new(vob_save_path)
+          Chapter.new(vob_save_path, title_number: title_set[:title], chapter_number: chapter_index)
         end
       end
       chapters.flatten

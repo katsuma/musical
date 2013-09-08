@@ -206,9 +206,13 @@ EOM
 
       def stub_methods
         Musical.should_receive(:configuration).at_least(1).times.and_return(configuration)
-        dvd.should_receive(:title_sets).and_return(title_sets)
+        dvd.should_receive(:title_sets).at_least(1).and_return(title_sets)
+        dvd.should_receive(:execute_command).at_least(1).with(/dvdbackup (.)*/, true) { FileUtils.touch(vob_path) }
         dvd.should_receive(:execute_command).at_least(1).with(/find (.)*/).and_return("#{vob_path}\n")
-        dvd.should_receive(:execute_command).at_least(1).with(/dvdbackup (.)*/) { FileUtils.touch(vob_path) }
+
+        progress_bar = double
+        progress_bar.should_receive(:increment).at_least(1)
+        ProgressBar.should_receive(:create).and_return(progress_bar)
       end
 
       before do
@@ -222,7 +226,7 @@ EOM
         FileUtils.rm_rf(configuration.output)
       end
 
-      it 'returns an array of chapter', fakefs: true do
+      it 'returns an array of all chapters', fakefs: true do
         expect(subject).to be_an Array
         expect(subject.size).to eq(7)
       end

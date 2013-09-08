@@ -8,14 +8,20 @@ Musical.setup
 dvd_options = {
   title: Musical.configuration.title,
   artist: Musical.configuration.artist,
-  dev: Musical.configuration.dev
+  path: Musical.configuration.path
 }
 
 DVD.load(dvd_options) do |dvd|
+  next puts dvd.info if Musical.configuration.info
+
   chapters = dvd.rip
 
   chapters.each do |chapter|
+    next if Musical.configuration.ignore_convert_sound
+
     wav = chapter.to_wav
+    next if Musical.configuration.ignore_use_itunes
+
     track = Itunes::Player.add(wav.path)
 
     converted_track = track.convert
@@ -27,7 +33,7 @@ DVD.load(dvd_options) do |dvd|
       track_number: chapter.chapter_number,
     )
 
-    wav.delete
-    track.delete
+    wav.delete!
+    track.delete!
   end
 end
