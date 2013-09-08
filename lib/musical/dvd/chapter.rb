@@ -14,7 +14,7 @@ module Musical
 
       @vob_path = vob_path
       @name = options[:name] || DEFAULT_CHAPTER_NAME
-      @chapter_number = options[:chpter_number] || DEFAULT_CHAPTER_NUMBER
+      @chapter_number = options[:chapter_number] || DEFAULT_CHAPTER_NUMBER
       @title_number = options[:title_number] || DEFAULT_TITLE_NUMBER
     end
 
