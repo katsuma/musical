@@ -34,7 +34,7 @@ Options:
                   --info, -i:   Show your DVD data
   --ignore-convert-sound, -g:   Rip data only, NOT convert them to wav file
      --ignore-use-itunes, -n:   NOT add ripped files to iTunes and encode them
-               --dev, -d <s>:   Set location of DVD device
+              --path, -p <s>:   Set device path of DVD
              --title, -t <s>:   Set DVD title (default: LIVE)
             --artist, -a <s>:   Set DVD artist (default: Artist)
             --output, -o <s>:   Set location of ripped data (default: ripped)
