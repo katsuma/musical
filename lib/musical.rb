@@ -11,6 +11,7 @@ require 'musical/version'
 require 'musical/dvd'
 require 'musical/dvd/chapter'
 require 'musical/dvd/wav'
+require 'musical/notification/progress_bar'
 
 module Musical
   extend Musical::Util
@@ -29,7 +30,7 @@ module Musical
 
     # parse options
     options = Trollop::options do
-      version "Musical #{Musical::VERSION}"
+      version "musical #{Musical::VERSION}"
       opt :info, "Show your DVD data", type: :boolean
       opt :ignore_convert_sound, "Rip data only, NOT convert them to wav file", type: :boolean
       opt :ignore_use_itunes, "NOT add ripped files to iTunes and encode them", type: :boolean

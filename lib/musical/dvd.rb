@@ -85,7 +85,7 @@ module Musical
       FileUtils.mkdir_p save_dir
 
       chapter_size = title_sets.inject(0){ |size, set| size + set[:chapter] }
-      progress_bar = ProgressBar.create(title: 'Ripping', total: chapter_size, format: '%a %B %p%% %t')
+      progress_bar = Notification::ProgressBar.create(title: 'Ripping', total: chapter_size, format: '%a %B %p%% %t')
       chapters = []
 
       title_sets.each do |title_set|
