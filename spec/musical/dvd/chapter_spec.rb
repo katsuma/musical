@@ -33,7 +33,7 @@ describe Musical::DVD::Chapter do
 
     before do
       chapter.should_receive(:execute_command).
-        with("ffmpeg -i #{vob_path} #{wav_path}", true).
+        with("ffmpeg -i #{vob_path} -ac 2 #{wav_path}", true).
         and_return(FileUtils.touch(wav_path))
     end
 
