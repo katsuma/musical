@@ -21,7 +21,7 @@ module Musical
     def to_wav(wav_path = "#{Musical.configuration.output}/chapter_#{@title_number}_#{@chapter_number}.wav")
       return @wav if @wav
 
-      command = "ffmpeg -i #{@vob_path} #{wav_path}"
+      command = "ffmpeg -i #{@vob_path} -ac 2 #{wav_path}"
       execute_command(command, true)
       DVD::Wav.new(wav_path)
     end
