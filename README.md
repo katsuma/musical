@@ -48,6 +48,7 @@ They will help you to manage your music library easily.
 
 
 ## Supported OS
+- OSX 10.9 (Mavericks)
 - OSX 10.8 (Mountain Lion)
 
 ## Supported Ruby
