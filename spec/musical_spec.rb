@@ -37,6 +37,11 @@ describe Musical do
       it { expect(setup.artist).to eq("artist!") }
     end
 
+    context 'when argument `year` is given' do
+      before { stub_const('ARGV', ['--year=2000']) }
+      it { expect(setup.year).to eq("2000") }
+    end
+
     context 'when argument `output` is given' do
       before { stub_const('ARGV', ['--output=/tmp']) }
       it { expect(setup.output).to eq('/tmp') }

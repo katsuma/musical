@@ -37,6 +37,7 @@ module Musical
       opt :path, "Set device path of DVD", type: :string
       opt :title, "Set DVD title", type: :string, default: 'LIVE'
       opt :artist, "Set DVD artist", type: :string, default: 'Artist'
+      opt :year, "Set year DVD was recorded", type: :string, default: Time.now.year.to_s
       opt :output, "Set location of ripped data", type: :string, default: 'ripped'
     end
 
