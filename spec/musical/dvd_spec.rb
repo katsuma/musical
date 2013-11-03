@@ -209,10 +209,6 @@ EOM
         dvd.should_receive(:title_sets).at_least(1).and_return(title_sets)
         dvd.should_receive(:execute_command).at_least(1).with(/dvdbackup (.)*/, true) { FileUtils.touch(vob_path) }
         dvd.should_receive(:execute_command).at_least(1).with(/find (.)*/).and_return("#{vob_path}\n")
-
-        progress_bar = double
-        progress_bar.should_receive(:increment).at_least(1)
-        ProgressBar.should_receive(:create).and_return(progress_bar)
       end
 
       before do

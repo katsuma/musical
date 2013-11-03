@@ -11,12 +11,17 @@ dvd_options = {
   year: Musical.configuration.year,
   path: Musical.configuration.path
 }
+progress_format = Musical.configuration.progress_format
 
 DVD.load(dvd_options) do |dvd|
   next puts dvd.info if Musical.configuration.info
 
-  chapters = dvd.rip
+  chapter_size = dvd.title_sets.inject(0){ |size, set| size + set[:chapter] }
+  ripping_progress_bar = Notification::ProgressBar.create(title: 'Ripping', total: chapter_size)
 
+  chapters = dvd.rip { ripping_progress_bar.increment }
+
+  converting_progress_bar = Notification::ProgressBar.create(title: 'Converting', total: chapters.size)
   chapters.each do |chapter|
     next if Musical.configuration.ignore_convert_sound
 
@@ -37,6 +42,8 @@ DVD.load(dvd_options) do |dvd|
 
     wav.delete!
     track.delete!
+
+    converting_progress_bar.increment
   end
 end
 
