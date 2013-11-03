@@ -21,10 +21,13 @@ DVD.load(dvd_options) do |dvd|
 
   chapters = dvd.rip { ripping_progress_bar.increment }
 
-  converting_progress_bar = Notification::ProgressBar.create(title: 'Converting', total: chapters.size)
-  chapters.each do |chapter|
-    next if Musical.configuration.ignore_convert_sound
+  next if Musical.configuration.ignore_convert_sound
 
+  unless Musical.configuration.ignore_use_itunes
+    converting_progress_bar = Notification::ProgressBar.create(title: 'Converting', total: chapters.size)
+  end
+
+  chapters.each do |chapter|
     wav = chapter.to_wav
     next if Musical.configuration.ignore_use_itunes
 
