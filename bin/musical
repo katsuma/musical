@@ -8,6 +8,7 @@ Musical.setup
 dvd_options = {
   title: Musical.configuration.title,
   artist: Musical.configuration.artist,
+  year: Musical.configuration.year,
   path: Musical.configuration.path
 }
 
@@ -29,6 +30,7 @@ DVD.load(dvd_options) do |dvd|
       name: chapter.name,
       album: dvd.title,
       artist: dvd.artist,
+      year: dvd.year,
       track_count: chapters.size,
       track_number: chapter.chapter_number,
     )

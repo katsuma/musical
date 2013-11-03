@@ -7,7 +7,7 @@ module Musical
     include Musical::Util
     extend Musical::Util
 
-    attr_accessor :title, :artist
+    attr_accessor :title, :artist, :year
 
     @@path = nil
 
@@ -40,8 +40,9 @@ module Musical
       end
 
       dvd = DVD.instance
-      dvd.title = options[:title] || Musical.configuration.title
+      dvd.title  = options[:title]  || Musical.configuration.title
       dvd.artist = options[:artist] || Musical.configuration.artist
+      dvd.year   = options[:year]   || Musical.configuration.year
 
       if block_given?
         yield(dvd)
