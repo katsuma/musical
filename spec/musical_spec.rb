@@ -39,7 +39,7 @@ describe Musical do
 
     context 'when argument `year` is given' do
       before { stub_const('ARGV', ['--year=2000']) }
-      it { expect(setup.year).to eq("2000") }
+      it { expect(setup.year).to eq(2000) }
     end
 
     context 'when argument `output` is given' do
