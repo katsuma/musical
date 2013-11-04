@@ -37,12 +37,13 @@ Options:
               --path, -p <s>:   Set device path of DVD
              --title, -t <s>:   Set DVD title (default: LIVE)
             --artist, -a <s>:   Set DVD artist (default: Artist)
+              --year, -y <i>:   Set year DVD was recorded (default: 2013)
             --output, -o <s>:   Set location of ripped data (default: ripped)
                --version, -v:   Print version and exit
                   --help, -h:   Show this message
 ```
 
-When you use iTunes, you should use `--title` and `--artist` options.
+When you use iTunes, you should use `--title`, `--artist` and `--year` options.
 
 They will help you to manage your music library easily.
 
