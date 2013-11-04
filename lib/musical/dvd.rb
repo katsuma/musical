@@ -100,9 +100,10 @@ module Musical
 
           vob_save_path = "#{save_dir}/TITLE_#{title_set[:title]}_#{chapter_index}.VOB"
           FileUtils.mv(vob_path, vob_save_path)
-          Chapter.new(vob_save_path, title_number: title_set[:title], chapter_number: chapter_index)
 
           yield if block_given?
+
+          Chapter.new(vob_save_path, title_number: title_set[:title], chapter_number: chapter_index)
         end
       end
       chapters.flatten
