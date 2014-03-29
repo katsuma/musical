@@ -30,6 +30,7 @@ DVD.load(dvd_options) do |dvd|
   chapters.each do |chapter|
     wav = chapter.to_wav
     next if Musical.configuration.ignore_use_itunes
+    next if wav.size.zero?
 
     track = Itunes::Player.add(wav.expand_path)
 
