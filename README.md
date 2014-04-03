@@ -53,6 +53,7 @@ They will help you to manage your music library easily.
 - OSX 10.8 (Mountain Lion)
 
 ## Supported Ruby
+- 2.1.0
 - 2.0.0
 - 1.9.3
 
