@@ -30,5 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "coveralls", "~> 0.6.6"
   spec.add_runtime_dependency "ruby-progressbar", ">= 1.2.0"
   spec.add_runtime_dependency "trollop", ">= 2.0"
-  spec.add_runtime_dependency "itunes-client", "~> 0.1.4"
+  spec.add_runtime_dependency "itunes-client", "~> 0.1.7"
 end
