@@ -29,25 +29,29 @@ DVD.load(dvd_options) do |dvd|
 
   chapters.each do |chapter|
     wav = chapter.to_wav
+
     next if Musical.configuration.ignore_use_itunes
-    next if wav.size.zero?
 
-    track = Itunes::Player.add(wav.expand_path)
+    begin
+      track = Itunes::Player.add(wav.expand_path)
 
-    converted_track = track.convert
-    converted_track.update_attributes(
-      name: chapter.name,
-      album: dvd.title,
-      artist: dvd.artist,
-      year: dvd.year,
-      track_count: chapters.size,
-      track_number: chapter.chapter_number,
-    )
+      converted_track = track.convert
+      converted_track.update_attributes(
+        name: chapter.name,
+        album: dvd.title,
+        artist: dvd.artist,
+        year: dvd.year,
+        track_count: chapters.size,
+        track_number: chapter.chapter_number,
+      )
+      wav.delete!
+      track.delete!
 
-    wav.delete!
-    track.delete!
-
-    converting_progress_bar.increment
+    rescue Itunes::Player::FileNotFoundError, Itunes::Player::EmptyFileError
+      # We can ignore these errors.
+    ensure
+      converting_progress_bar.increment
+    end
   end
 end
 
