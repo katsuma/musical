@@ -44,12 +44,12 @@ DVD.load(dvd_options) do |dvd|
         track_count: chapters.size,
         track_number: chapter.chapter_number,
       )
-      wav.delete!
-      track.delete!
-
     rescue Itunes::Player::FileNotFoundError, Itunes::Player::EmptyFileError
       # We can ignore these errors.
     ensure
+      wav.delete!   if wav
+      track.delete! if track
+
       converting_progress_bar.increment
     end
   end
