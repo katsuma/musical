@@ -7,7 +7,7 @@ describe Musical::Notification::ProgressBar do
     subject!(:progress_bar) { described_class.create(total: 3, format: '') }
 
     it 'returns unfinished ProgressBar' do
-      expect(progress_bar.finished?).to be_false
+      expect(progress_bar.finished?).to be_falsey
     end
   end
 end

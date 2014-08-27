@@ -11,7 +11,7 @@ describe DVD do
 
     context 'when DVD drive is not found' do
       before do
-        DVD.should_receive(:execute_command).with(drutil).and_return('')
+        expect(DVD).to receive(:execute_command).with(drutil).and_return('')
       end
 
       it 'raises a RuntimeError' do
@@ -28,7 +28,7 @@ MATSHITA DVD-R   UJ-85J    FM0S
 Type: No Media Inserted
 EOM
       end
-      before { DVD.should_receive(:execute_command).with(drutil).and_return(drutil_out) }
+      before { expect(DVD).to receive(:execute_command).with(drutil).and_return(drutil_out) }
 
       it 'raises a RuntimeError' do
         expect { detect }.to raise_error(RuntimeError)
@@ -51,10 +51,10 @@ EOM
 EOM
       end
       before do
-        DVD.should_receive(:execute_command).with(drutil).and_return(drutil_out)
+        expect(DVD).to receive(:execute_command).with(drutil).and_return(drutil_out)
       end
 
-      it { should == '/dev/disk3' }
+      it { is_expected.to eq('/dev/disk3') }
     end
   end
 
@@ -76,7 +76,7 @@ EOM
 
   describe '.load' do
     before { DVD.path = nil }
-    before { DVD.any_instance.should_receive(:info).and_return('info data') }
+    before { expect_any_instance_of(DVD).to receive(:info).and_return('info data') }
 
     context 'when options are not given' do
       subject { DVD.load }
@@ -84,14 +84,14 @@ EOM
       context 'and if path is set' do
         before { DVD.path = '/dev/some/path' }
         it 'does not call DVD.detect' do
-          DVD.should_not_receive(:detect)
+          expect(DVD).not_to receive(:detect)
           subject
         end
       end
 
       context 'and if DVD path is not set' do
         it 'sets path by DVD.detect' do
-          DVD.should_receive(:detect).and_return('/dev/some/path')
+          expect(DVD).to receive(:detect).and_return('/dev/some/path')
           subject
           expect(DVD.path).to eq('/dev/some/path')
         end
@@ -119,7 +119,7 @@ EOM
         before { DVD.path = '/dev/some/path' }
 
         it 'calls DVD.detect forcibly even if path is already set' do
-          DVD.should_receive(:detect).and_return('/dev/some/path')
+          expect(DVD).to receive(:detect).and_return('/dev/some/path')
           subject
         end
       end
@@ -127,7 +127,7 @@ EOM
 
     context 'when block is given' do
       subject { DVD.load { |dvd| dvd.artist = 'some artist' }  }
-      before { DVD.should_receive(:detect).and_return('/dev/path') }
+      before { expect(DVD).to receive(:detect).and_return('/dev/path') }
       it 'calls proc object' do
         subject
         expect(DVD.instance.artist).to eq('some artist')
@@ -150,7 +150,7 @@ EOM
       before { DVD.path = '/dev/path' }
       let(:info_data) { 'dvd data' }
       it 'returns DVD disk data' do
-        dvd.should_receive(:execute_command).with("dvdbackup --info --input='/dev/path'", true).and_return(info_data)
+        expect(dvd).to receive(:execute_command).with("dvdbackup --info --input='/dev/path'", true).and_return(info_data)
         expect(subject).to eq(info_data)
       end
     end
@@ -176,7 +176,7 @@ EOM
     end
     let(:dvd) { DVD.instance }
 
-    before { dvd.should_receive(:info).and_return(info) }
+    before { expect(dvd).to receive(:info).and_return(info) }
 
     it 'returns each pair of title and chapter data' do
       expect(subject).to be_an Array
@@ -205,10 +205,10 @@ EOM
       let(:vob_path) { '/tmp/working/foo.vob' }
 
       def stub_methods
-        Musical.should_receive(:configuration).at_least(1).times.and_return(configuration)
-        dvd.should_receive(:title_sets).at_least(1).and_return(title_sets)
-        dvd.should_receive(:execute_command).at_least(1).with(/dvdbackup (.)*/, true) { FileUtils.touch(vob_path) }
-        dvd.should_receive(:execute_command).at_least(1).with(/find (.)*/).and_return("#{vob_path}\n")
+        expect(Musical).to receive(:configuration).at_least(1).times.and_return(configuration)
+        expect(dvd).to receive(:title_sets).at_least(1).and_return(title_sets)
+        expect(dvd).to receive(:execute_command).at_least(1).with(/dvdbackup (.)*/, true) { FileUtils.touch(vob_path) }
+        expect(dvd).to receive(:execute_command).at_least(1).with(/find (.)*/).and_return("#{vob_path}\n")
       end
 
       before do
