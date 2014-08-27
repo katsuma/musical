@@ -32,7 +32,7 @@ describe Musical::DVD::Chapter do
     let(:wav_path) { '/tmp/foo.wav' }
 
     before do
-      chapter.should_receive(:execute_command).
+      expect(chapter).to receive(:execute_command).
         with("ffmpeg -i #{vob_path} -ac 2 #{wav_path}", true).
         and_return(FileUtils.touch(wav_path))
     end

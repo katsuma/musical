@@ -13,7 +13,7 @@ describe Musical::Util do
 
     context 'when app is not installed' do
       before do
-        klass.should_receive(:installed?).and_return(false)
+        expect(klass).to receive(:installed?).and_return(false)
       end
 
       it 'raises a RuntimeError' do
@@ -23,10 +23,10 @@ describe Musical::Util do
 
     context 'when app is installed' do
       before do
-        klass.should_receive(:installed?).twice.and_return(true)
+        expect(klass).to receive(:installed?).twice.and_return(true)
       end
 
-      it { should be_true }
+      it { is_expected.to be_truthy }
     end
   end
 
@@ -36,16 +36,16 @@ describe Musical::Util do
 
     context 'when app is not installed' do
       before do
-        klass.should_receive(:execute_command).with("which #{app}").and_return('')
+        expect(klass).to receive(:execute_command).with("which #{app}").and_return('')
       end
-      it { should be_false }
+      it { is_expected.to be_falsey }
     end
 
     context 'when spp is installed' do
       before do
-        klass.should_receive(:execute_command).with("which #{app}").and_return('/path/to/app')
+        expect(klass).to receive(:execute_command).with("which #{app}").and_return('/path/to/app')
       end
-      it { should be_true }
+      it { is_expected.to be_truthy }
     end
   end
 
@@ -55,13 +55,13 @@ describe Musical::Util do
 
     context 'when silent options is not given' do
       subject { klass.execute_command(cmd) }
-      before { Open3.should_receive(:capture2).with(cmd).and_return(path) }
+      before { expect(Open3).to receive(:capture2).with(cmd).and_return(path) }
       it { expect(subject).to eq(path) }
     end
 
     context 'when silent option is given' do
       subject { klass.execute_command(cmd, true) }
-      before { Open3.should_receive(:capture2).with("#{cmd} 2>/dev/null").and_return(path) }
+      before { expect(Open3).to receive(:capture2).with("#{cmd} 2>/dev/null").and_return(path) }
       it { expect(subject).to eq(path) }
     end
   end
