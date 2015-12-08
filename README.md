@@ -49,15 +49,15 @@ They will help you to manage your music library easily.
 
 
 ## Supported OS
+- OSX El Capitan
 - OSX Yosemite
 - OSX Mavericks
 
 
 ## Supported Ruby
-- 2.2.0-preview1
-- 2.1.0
-- 2.0.0
-- 1.9.3
+- 2.2
+- 2.1
+- 2.0
 
 
 ## License
